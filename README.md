@@ -12,6 +12,6 @@ Silahkan fork project ini jika kalian ingin melilat bagaimana aplikasinya berker
 
 > Database Design - https://github.dev/wicahma/Database-Design
 
-> Backend App - _Under Construction_
+> Backend App - https://github.com/wicahma/Portal-Balik-Backend
 
 > Frondend Web Admin - _Under Construction_
