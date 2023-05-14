@@ -1,16 +1,17 @@
-# inventaris
+# Portal Balik App
 
-A new Flutter project.
+####  _Program Digitalisasi Barang Milik Daerah_
+
+Sebuah Project flutter yang berkaitan dengan aplikasi digitalisasi dan juga inventaris barang yang di build dengan menggunakan Framework Flutter dengan menggunakan bahasa pemrograman Dart
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Silahkan fork project ini jika kalian ingin melilat bagaimana aplikasinya berkerja :)
 
-A few resources to get you started if this is your first Flutter project:
+## Useful Links
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+> Database Design - https://github.dev/wicahma/Database-Design
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+> Backend App - _Under Construction_
+
+> Frondend Web Admin - _Under Construction_
