@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:inventaris/pages/history_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Portal());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class Portal extends StatefulWidget {
+  const Portal({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<Portal> createState() => _PortalState();
+}
+
+class _PortalState extends State<Portal> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        title: 'Flutter Demo',
-        home: Scaffold(
-          body: Center(
-            child: Text('Hello World'),
-          ),
-        ));
+    return MaterialApp(
+      title: 'Portal Inventaris',
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+      ),
+      home: const HistoryPage(),
+    );
   }
 }
