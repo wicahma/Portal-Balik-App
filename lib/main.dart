@@ -21,6 +21,10 @@ class _PortalState extends State<Portal> {
         fontFamily: 'Poppins',
       ),
       home: const HistoryPage(),
+      // routes: {
+      //   '/riwayat': (context) => const HistoryPage(),
+      //   '/detail': (context) => const _createRoute(),
+      // },
     );
   }
 }
