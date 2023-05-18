@@ -30,10 +30,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  qr_code_scanner: 1.0.1
+  flutter_pdfview: ^1.3.1
+  scan: ^1.6.0
   flutter_svg: 2.0.5
   image_picker: ^0.8.7+5
   cupertino_icons: ^1.0.2
+  path_provider: ^2.0.15
+  flutter_hooks: ^0.18.6
 
 dev_dependencies:
   flutter_test:
@@ -57,9 +60,18 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/icons/close.svg
+    - assets/icons/flash - off.svg
+    - assets/icons/flash - on.svg
+    - assets/icons/gallery.svg
 
-  # - images/a_dot_ham.jpeg
+    # for testing purpose only
+    - assets/dokumen_testing.pdf
+    - assets/images/test_1.jpg
+    - assets/images/test_2.jpeg
+    - assets/images/test_3.jpg
+    - assets/images/test_4.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

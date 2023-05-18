@@ -1,7 +1,7 @@
-import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:scan/scan.dart';
 
 class CameraButton extends StatefulWidget {
   const CameraButton({super.key});
@@ -12,23 +12,11 @@ class CameraButton extends StatefulWidget {
 
 class _CameraButtonState extends State<CameraButton> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  Barcode? result;
-  QRViewController? controller;
-  String flashDir = "assets/icons/flash - off.svg";
+  ScanController controllerScanner = ScanController();
+  String result = 'Unknown';
 
   final ImagePicker picker = ImagePicker();
-
-  late final XFile? image;
-
-  @override
-  void reassemble() {
-    super.reassemble();
-    if (Platform.isAndroid) {
-      controller!.pauseCamera();
-    } else if (Platform.isIOS) {
-      controller!.resumeCamera();
-    }
-  }
+  XFile? image;
 
   double getSizeWidth(BuildContext context) =>
       MediaQuery.of(context).size.width * 1;
@@ -43,7 +31,7 @@ class _CameraButtonState extends State<CameraButton> {
           builder: (BuildContext context) => Container(
               height: 500,
               decoration: const BoxDecoration(
-                  color: Color(0xff37718E),
+                  color: Color(0xffF5F5F5),
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30))),
@@ -54,61 +42,79 @@ class _CameraButtonState extends State<CameraButton> {
                     width: getSizeWidth(context),
                     child: ClipRRect(
                         borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
+                            const BorderRadius.all(Radius.circular(25)),
                         child: AspectRatio(
                           aspectRatio: 4 / 4.5,
-                          child: QRView(
-                            key: qrKey,
-                            onQRViewCreated: _onQRViewCreated,
-                            overlay: QrScannerOverlayShape(
-                                borderRadius: 20,
-                                overlayColor: Colors.white24,
-                                borderColor: Colors.white,
-                                borderLength: 30,
-                                cutOutBottomOffset: 25,
-                                borderWidth: 5,
-                                cutOutSize: 350),
+                          child: ScanView(
+                            controller: controllerScanner,
+                            scanAreaScale: .7,
+                            scanLineColor: Colors.white,
+                            onCapture: (data) => _onQRFound(data),
                           ),
                         )),
                   ),
-                  // TextButton(onPressed: () {}, child: const Text("flash")),
+                  const Positioned(
+                      bottom: 65,
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Scan QR Code",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white)),
+                            Text(
+                              "Arahkan kamera ke barcode atau pilih gambar dari galeri.",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  height: 0.8),
+                            ),
+                          ],
+                        ),
+                      )),
                   Positioned(
-                    bottom: 0,
+                    bottom: 10,
                     left: getSizeWidth(context) / 4,
                     child: Container(
                       width: getSizeWidth(context) / 2,
                       height: 50,
                       decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30))),
+                          color: Color(0xffF5F5F5),
+                          borderRadius: BorderRadius.all(Radius.circular(30))),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
-                              onPressed: () async {
-                                await controller!.toggleFlash();
+                              onPressed: () {
+                                controllerScanner.toggleTorchMode();
                                 setState(() {});
                               },
-                              icon: const Icon(
-                                Icons.flash_on,
+                              icon: SvgPicture.asset(
+                                "assets/icons/flash - off.svg",
+                                colorFilter: const ColorFilter.mode(
+                                    Color(0xffF5F5F5), BlendMode.difference),
                               )),
                           IconButton(
-                              onPressed: () async {
-                                image = await picker.pickImage(
-                                    source: ImageSource.gallery);
-                                setState(() {
-                                  Navigator.pop(context);
-                                });
-                              },
-                              icon: const Icon(Icons.photo_library)),
+                              onPressed: () => _onSearchGallery(context),
+                              icon: SvgPicture.asset(
+                                "assets/icons/gallery.svg",
+                                colorFilter: const ColorFilter.mode(
+                                    Color(0xffF5F5F5), BlendMode.difference),
+                              )),
                           IconButton(
                               onPressed: () {
+                                controllerScanner.pause();
                                 Navigator.pop(context);
                                 setState(() {});
                               },
-                              icon: const Icon(Icons.close_rounded)),
+                              icon: SvgPicture.asset("assets/icons/close.svg",
+                                  colorFilter: const ColorFilter.mode(
+                                      Color(0xffF5F5F5),
+                                      BlendMode.difference))),
                         ],
                       ),
                     ),
@@ -120,13 +126,26 @@ class _CameraButtonState extends State<CameraButton> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    // controller.resumeCamera();
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
+  void _onQRFound(data) {
+    debugPrint(data);
+    setState(() {
+      result = data;
     });
+    Navigator.pop(context, result);
+  }
+
+  void _onSearchGallery(BuildContext context) async {
+    image = await picker.pickImage(source: ImageSource.gallery);
+    debugPrint("Hasil gambar");
+    debugPrint(image!.path);
+    String? result = await Scan.parse(image!.path);
+
+    if (result != null && context.mounted) {
+      debugPrint(result);
+      Navigator.pop(context, result);
+    }
+    debugPrint("Kode QR Tidak Terdeteksi!");
+
+    setState(() {});
   }
 }

@@ -1,7 +1,14 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter_hooks/flutter_hooks.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inventaris/components/cards/detail_minicard.dart';
 import 'package:inventaris/components/fab/camera_button.dart';
+import 'package:inventaris/components/modal/images_product_modal.dart';
+import 'package:inventaris/components/modal/pdf_view_modal.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
@@ -11,6 +18,35 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  String pathPDF = "";
+
+  late String error;
+
+  @override
+  void initState() {
+    super.initState();
+    fromAsset('assets/dokumen_testing.pdf', 'dokumen_testing.pdf').then((f) {
+      setState(() {
+        pathPDF = f.path;
+      });
+    });
+  }
+
+  Future<File> fromAsset(String asset, String filename) async {
+    Completer<File> completer = Completer();
+    try {
+      var dir = await getApplicationDocumentsDirectory();
+      File file = File("${dir.path}/$filename");
+      var data = await rootBundle.load(asset);
+      var bytes = data.buffer.asUint8List();
+      await file.writeAsBytes(bytes, flush: true);
+      completer.complete(file);
+    } catch (e) {
+      error = 'Error: ${e.toString()}';
+    }
+    return completer.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +118,7 @@ class _DetailPageState extends State<DetailPage> {
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(2),
-                                margin: const EdgeInsets.only(bottom: 15),
+                                margin: const EdgeInsets.only(bottom: 10),
                                 decoration: BoxDecoration(
                                   color: const Color(0xffF5F5F5),
                                   borderRadius: BorderRadius.circular(7),
@@ -95,6 +131,101 @@ class _DetailPageState extends State<DetailPage> {
                                     fontWeight: FontWeight.w500,
                                     color: Color(0xff37718E),
                                   ),
+                                ),
+                              ),
+                              ListView(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                children: const [
+                                  Text(
+                                    "Pemegang barang",
+                                    style: TextStyle(
+                                      color: Color(0xffF5F5F5),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Teguh Dwi Cahya Kusuma",
+                                    style: TextStyle(
+                                        color: Color(0xffF5F5F5),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton.icon(
+                                        style: ButtonStyle(
+                                          shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          )),
+                                          backgroundColor: MaterialStateProperty
+                                              .resolveWith<Color>(
+                                            (Set<MaterialState> states) {
+                                              if (states.contains(
+                                                  MaterialState.pressed)) {
+                                                return const Color(0xFF72ADCB);
+                                              }
+                                              return const Color(0xff37718E);
+                                            },
+                                          ),
+                                        ),
+                                        onPressed: () => showModalBottomSheet(
+                                            enableDrag: false,
+                                            context: context,
+                                            backgroundColor: Colors.transparent,
+                                            isScrollControlled: true,
+                                            builder: (BuildContext context) {
+                                              if (pathPDF.isNotEmpty) {
+                                                return PdfViewModal(
+                                                    pathPDF: pathPDF);
+                                              } else {
+                                                return const PdfViewModal(
+                                                    pathPDF: "");
+                                              }
+                                            }),
+                                        icon: const Icon(
+                                            Icons.description_rounded),
+                                        label: const Text("Lihat PDF")),
+                                    ElevatedButton.icon(
+                                        style: ButtonStyle(
+                                          shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          )),
+                                          backgroundColor: MaterialStateProperty
+                                              .resolveWith<Color>(
+                                            (Set<MaterialState> states) {
+                                              if (states.contains(
+                                                  MaterialState.pressed)) {
+                                                return const Color(0xFF72ADCB);
+                                              }
+                                              return const Color(0xff37718E);
+                                            },
+                                          ),
+                                        ),
+                                        onPressed: () => showModalBottomSheet(
+                                            context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            builder: (BuildContext context) =>
+                                                const ProductModal()),
+                                        icon: const Icon(Icons.image_rounded),
+                                        label: const Text("Lihat Barang")),
+                                  ],
                                 ),
                               ),
                               const MiniCard(
