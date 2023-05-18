@@ -72,9 +72,9 @@ class _HistoryCardState extends State<HistoryCard> {
                           Text(
                             "ID - ${widget.id.toUpperCase()}",
                             style: const TextStyle(
-                              color: Color(0xff255771),
-                              fontSize: 12,
-                            ),
+                                color: Color(0xff255771),
+                                fontSize: 12,
+                                height: 1),
                           ),
                         ],
                       )),
@@ -144,6 +144,7 @@ class _HistoryCardState extends State<HistoryCard> {
                                 style: TextStyle(
                                     color: Color(0xffF5F5F5),
                                     fontSize: 30,
+                                    height: 1,
                                     fontWeight: FontWeight.w600),
                               )
                             ],

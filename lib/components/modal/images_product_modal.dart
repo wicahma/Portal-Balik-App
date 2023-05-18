@@ -84,7 +84,7 @@ class _ProductModalState extends State<ProductModal> {
           fit: StackFit.loose,
           children: [
             Container(
-                clipBehavior: Clip.antiAlias,
+                clipBehavior: Clip.none,
                 padding: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
                   borderRadius:
@@ -97,11 +97,18 @@ class _ProductModalState extends State<ProductModal> {
                   scrollDirection: Axis.vertical,
                   children: List.generate(
                       dataTest.length,
-                      (index) => ImageCard(
-                          gambar: dataTest[index],
-                          kualitas: "Bagus",
-                          status: "Digunakan",
-                          barangKe: "1")),
+                      (index) => Column(
+                            children: [
+                              ImageCard(
+                                  gambar: dataTest[index],
+                                  kualitas: "Bagus",
+                                  status: "Digunakan",
+                                  barangKe: (index + 1).toString()),
+                              const SizedBox(
+                                height: 15,
+                              )
+                            ],
+                          )),
                 ))
           ],
         )
