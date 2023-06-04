@@ -146,7 +146,7 @@ class _DetailPageState extends State<DetailPage> {
                                     ),
                                   ),
                                   Text(
-                                    "Teguh Dwi Cahya Kusuma",
+                                    "Al Husain Mardani",
                                     style: TextStyle(
                                         color: Color(0xffF5F5F5),
                                         fontSize: 18,

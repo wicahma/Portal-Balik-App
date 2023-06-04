@@ -12,9 +12,6 @@ class ProductModal extends StatefulWidget {
 class _ProductModalState extends State<ProductModal> {
   List dataTest = [
     'assets/images/test_1.jpg',
-    'assets/images/test_2.jpeg',
-    'assets/images/test_3.jpg',
-    'assets/images/test_4.jpg'
   ];
 
   double getSizeWidth(BuildContext context) =>
@@ -84,32 +81,20 @@ class _ProductModalState extends State<ProductModal> {
           fit: StackFit.loose,
           children: [
             Container(
-                clipBehavior: Clip.none,
-                padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  borderRadius:
-                      BorderRadius.only(topRight: Radius.circular(30)),
-                  color: Colors.white,
-                ),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 7 / 12,
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  children: List.generate(
-                      dataTest.length,
-                      (index) => Column(
-                            children: [
-                              ImageCard(
-                                  gambar: dataTest[index],
-                                  kualitas: "Bagus",
-                                  status: "Digunakan",
-                                  barangKe: (index + 1).toString()),
-                              const SizedBox(
-                                height: 15,
-                              )
-                            ],
-                          )),
-                ))
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(topRight: Radius.circular(30)),
+                color: Colors.white,
+              ),
+              width: MediaQuery.of(context).size.width,
+              // height: MediaQuery.of(context).size.height * 7 / 12,
+              child: ImageCard(
+                  gambar: dataTest[0],
+                  kualitas: "Bagus",
+                  status: "Digunakan",
+                  barangKe: (1).toString()),
+            )
           ],
         )
       ],

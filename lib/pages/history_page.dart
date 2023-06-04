@@ -34,12 +34,12 @@ class _HistoryPageState extends State<HistoryPage> {
         body: ListView(
           padding: const EdgeInsets.all(10),
           children: [
-            for (int i = 0; i < 3; i++)
+            for (int i = 1; i < 4; i++)
               HistoryCard(
                 namaBarang: "Printer HP",
                 harga: 2000000 * i,
                 id: "a3su5s123mn4c7i23s3u7",
-                jumlah: 3 * i,
+                kondisi: "baik",
                 tanggalBeli: "2021-10-10 10:10:10",
               ),
           ],

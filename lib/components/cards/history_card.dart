@@ -7,11 +7,11 @@ class HistoryCard extends StatefulWidget {
       required this.namaBarang,
       required this.tanggalBeli,
       required this.harga,
-      required this.jumlah,
+      required this.kondisi,
       required this.id});
 
-  final String namaBarang, tanggalBeli, id;
-  final int harga, jumlah;
+  final String namaBarang, kondisi, tanggalBeli, id;
+  final int harga;
 
   @override
   State<HistoryCard> createState() => _HistoryCardState();
@@ -81,7 +81,7 @@ class _HistoryCardState extends State<HistoryCard> {
                   Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 15, vertical: 10),
-                      child: const Column(
+                      child: Column(
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -90,23 +90,23 @@ class _HistoryCardState extends State<HistoryCard> {
                             direction: Axis.horizontal,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "Jumlah",
+                              const Text(
+                                "Kondisi",
                                 style: TextStyle(
                                     color: Color(0xffF5F5F5),
                                     fontSize: 16.5,
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
-                                "2",
-                                style: TextStyle(
+                                widget.kondisi,
+                                style: const TextStyle(
                                     color: Color(0xffF5F5F5),
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400),
                               )
                             ],
                           ),
-                          Flex(
+                          const Flex(
                             mainAxisSize: MainAxisSize.max,
                             direction: Axis.horizontal,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -127,7 +127,7 @@ class _HistoryCardState extends State<HistoryCard> {
                               )
                             ],
                           ),
-                          Flex(
+                          const Flex(
                             mainAxisSize: MainAxisSize.max,
                             direction: Axis.vertical,
                             crossAxisAlignment: CrossAxisAlignment.end,
