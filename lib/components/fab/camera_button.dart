@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inventaris/pages/detail_page.dart';
 import 'package:scan/scan.dart';
 
 class CameraButton extends StatefulWidget {
@@ -127,11 +128,17 @@ class _CameraButtonState extends State<CameraButton> {
   }
 
   void _onQRFound(data) {
-    debugPrint(data);
+    // debugPrint("Hasil QR Code");
+    // debugPrint(data);
     setState(() {
       result = data;
     });
-    Navigator.pop(context, result);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DetailPage(
+                  id: data,
+                )));
   }
 
   void _onSearchGallery(BuildContext context) async {
@@ -141,6 +148,7 @@ class _CameraButtonState extends State<CameraButton> {
     String? result = await Scan.parse(image!.path);
 
     if (result != null && context.mounted) {
+      debugPrint("Hasil QR Code");
       debugPrint(result);
       Navigator.pop(context, result);
     }

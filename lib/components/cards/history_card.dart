@@ -19,7 +19,8 @@ class HistoryCard extends StatefulWidget {
 
 Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const DetailPage(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const DetailPage(id: "5fc8aa08-de7c-4405-bebd-2234fdf9d13f"),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
