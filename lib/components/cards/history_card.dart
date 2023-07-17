@@ -8,19 +8,19 @@ class HistoryCard extends StatefulWidget {
       required this.tanggalBeli,
       required this.harga,
       required this.kondisi,
+      required this.barangKe,
       required this.id});
 
   final String namaBarang, kondisi, tanggalBeli, id;
-  final int harga;
+  final int harga, barangKe;
 
   @override
   State<HistoryCard> createState() => _HistoryCardState();
 }
 
-Route _createRoute() {
+Route _createRoute(String id) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const DetailPage(id: "5fc8aa08-de7c-4405-bebd-2234fdf9d13f"),
+    pageBuilder: (context, animation, secondaryAnimation) => DetailPage(id: id),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
@@ -41,12 +41,12 @@ class _HistoryCardState extends State<HistoryCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          Navigator.of(context).push(_createRoute());
+          Navigator.of(context).push(_createRoute(widget.id));
         },
         child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: const Color(0xff255771),
+              color: const Color(0xFF257141),
             ),
             margin: const EdgeInsets.symmetric(vertical: 5),
             child: Column(
@@ -57,13 +57,13 @@ class _HistoryCardState extends State<HistoryCard> {
                           horizontal: 15, vertical: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: const Color(0xff37718E),
+                        color: const Color(0xFF378E55),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.namaBarang,
+                            "${widget.namaBarang} - ${widget.barangKe}",
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -73,7 +73,7 @@ class _HistoryCardState extends State<HistoryCard> {
                           Text(
                             "ID - ${widget.id.toUpperCase()}",
                             style: const TextStyle(
-                                color: Color(0xff255771),
+                                color: Color(0xFF257141),
                                 fontSize: 12,
                                 height: 1),
                           ),
@@ -136,7 +136,7 @@ class _HistoryCardState extends State<HistoryCard> {
                               Text(
                                 "Harga",
                                 style: TextStyle(
-                                    color: Color(0xff266B8F),
+                                    color: Color(0xFF268F4E),
                                     fontSize: 16.5,
                                     fontWeight: FontWeight.w400),
                               ),

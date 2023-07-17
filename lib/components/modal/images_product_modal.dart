@@ -3,17 +3,22 @@ import 'package:inventaris/components/cards/image_product_card.dart';
 import 'package:inventaris/components/modal/clipper_modal.dart';
 
 class ProductModal extends StatefulWidget {
-  const ProductModal({super.key});
+  final String imagaName;
+  final String kondisi;
+  final String status;
+  final String barangKe;
+  const ProductModal(
+      {super.key,
+      required this.imagaName,
+      required this.kondisi,
+      required this.status,
+      required this.barangKe});
 
   @override
   State<ProductModal> createState() => _ProductModalState();
 }
 
 class _ProductModalState extends State<ProductModal> {
-  List dataTest = [
-    'assets/images/test_1.jpg',
-  ];
-
   double getSizeWidth(BuildContext context) =>
       MediaQuery.of(context).size.width * 1 / 5;
   double getSizeHeight(BuildContext context) =>
@@ -66,9 +71,9 @@ class _ProductModalState extends State<ProductModal> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 child: const Text(
-                  "Foto Kualitas Barang",
+                  "Foto Kondisi Barang",
                   style: TextStyle(
-                    color: Color(0xff37718E),
+                    color: Color(0xFF378E55),
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
@@ -90,10 +95,10 @@ class _ProductModalState extends State<ProductModal> {
               width: MediaQuery.of(context).size.width,
               // height: MediaQuery.of(context).size.height * 7 / 12,
               child: ImageCard(
-                  gambar: dataTest[0],
-                  kualitas: "Bagus",
-                  status: "Digunakan",
-                  barangKe: (1).toString()),
+                  gambar: widget.imagaName,
+                  kondisi: widget.kondisi,
+                  status: widget.status,
+                  barangKe: widget.barangKe),
             )
           ],
         )

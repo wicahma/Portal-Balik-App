@@ -4,23 +4,43 @@ class ImageCard extends StatelessWidget {
   const ImageCard(
       {super.key,
       required this.gambar,
-      required this.kualitas,
+      required this.kondisi,
       required this.status,
       required this.barangKe});
 
-  final String gambar, kualitas, status, barangKe;
+  final String gambar, kondisi, status, barangKe;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Image.asset(
-          gambar,
+        Image(
+          image: NetworkImage(
+            "https://be.sibesti.com/$gambar",
+          ),
           frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            // if (wasSynchronouslyLoaded) {
-            //   return child;
-            // }
+            if (wasSynchronouslyLoaded) {
+              return Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: child,
+              );
+            }
+            if (frame == null) {
+              return Container(
+                clipBehavior: Clip.antiAlias,
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF378E55)),
+                ),
+              );
+            }
             return Container(
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
@@ -30,6 +50,9 @@ class ImageCard extends StatelessWidget {
             );
           },
         ),
+        // Image.asset(
+        //   gambar,
+        // ),
         const SizedBox(
           height: 10,
         ),
@@ -47,7 +70,7 @@ class ImageCard extends StatelessWidget {
                     color: Colors.black),
               ),
               Text(
-                'Kualitas: $kualitas',
+                'Kondisi: $kondisi',
                 style: const TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 14,

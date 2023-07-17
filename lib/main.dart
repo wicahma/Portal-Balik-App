@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:inventaris/pages/history_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
-  runApp(const Portal());
+  initializeDateFormatting('id_ID', null).then((_) {
+    runApp(const Portal());
+  });
 }
 
 class Portal extends StatefulWidget {
@@ -21,10 +24,6 @@ class _PortalState extends State<Portal> {
         fontFamily: 'Poppins',
       ),
       home: const HistoryPage(),
-      // routes: {
-      //   '/riwayat': (context) => const HistoryPage(),
-      //   '/detail': (context) => const _createRoute(),
-      // },
     );
   }
 }

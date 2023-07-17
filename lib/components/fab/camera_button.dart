@@ -25,6 +25,7 @@ class _CameraButtonState extends State<CameraButton> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      heroTag: "kamera",
       onPressed: () => showModalBottomSheet(
           context: context,
           elevation: 10,
@@ -122,14 +123,12 @@ class _CameraButtonState extends State<CameraButton> {
                   )
                 ],
               ))),
-      backgroundColor: const Color(0xff37718E),
+      backgroundColor: const Color(0xFF378E55),
       child: const Icon(Icons.add_a_photo_outlined),
     );
   }
 
   void _onQRFound(data) {
-    // debugPrint("Hasil QR Code");
-    // debugPrint(data);
     setState(() {
       result = data;
     });
@@ -142,18 +141,25 @@ class _CameraButtonState extends State<CameraButton> {
   }
 
   void _onSearchGallery(BuildContext context) async {
-    image = await picker.pickImage(source: ImageSource.gallery);
-    debugPrint("Hasil gambar");
-    debugPrint(image!.path);
-    String? result = await Scan.parse(image!.path);
+    try {
+      image = await picker.pickImage(source: ImageSource.gallery);
 
-    if (result != null && context.mounted) {
-      debugPrint("Hasil QR Code");
-      debugPrint(result);
-      Navigator.pop(context, result);
+      if (image == null) throw Exception("Image is null");
+      String? result = await Scan.parse(image!.path);
+
+      if (result != null && context.mounted) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailPage(
+                      id: result,
+                    )));
+      }
+
+      // setState(() {});
+    } catch (e) {
+      // Handling exception
+      debugPrint(e.toString());
     }
-    debugPrint("Kode QR Tidak Terdeteksi!");
-
-    setState(() {});
   }
 }

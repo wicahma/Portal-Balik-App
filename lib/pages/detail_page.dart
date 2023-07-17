@@ -11,6 +11,8 @@ import 'package:inventaris/components/modal/images_product_modal.dart';
 import 'package:inventaris/components/modal/pdf_view_modal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPage extends StatefulWidget {
   final String id;
@@ -29,16 +31,57 @@ class _DetailPageState extends State<DetailPage> {
       "Waduh data yang kamu cari gaada nih, bisa jadi udah dihapus sama si mimin, maaf yaa";
   String pathPDF = "";
   late String error;
+  NumberFormat rupiah = NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: 'Rp. ',
+  );
+  String _tanggal(String tanggal) {
+    return DateFormat('EEEE, dd MMMM yyyy, HH:mm:ss', 'id_ID')
+        .format(DateTime.parse(tanggal));
+  }
 
   @override
   void initState() {
     super.initState();
     _getData(widget.id);
-    fromAsset('assets/dokumen_testing.pdf', 'dokumen_testing.pdf').then((f) {
-      setState(() {
-        pathPDF = f.path;
+  }
+
+  Future<void> _saveToLocalStorage(Map<String, dynamic> data) async {
+    try {
+      String dataJSON = jsonEncode(data);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> historyList = prefs.getStringList('riwayat') ?? [];
+
+      if (historyList.isEmpty) {
+        historyList.add(dataJSON);
+        debugPrint("Datanya gaada, list baru ditambahkan");
+      }
+
+      int isExist = historyList.indexWhere((element) {
+        return jsonDecode(element)["_idBarang"].toString() ==
+                data["_idBarang"].toString() &&
+            jsonDecode(element)["barangKe"].toString() ==
+                data["barangKe"].toString();
       });
-    });
+      debugPrint("isExist: $isExist");
+
+      if (isExist != -1) {
+        historyList.removeAt(isExist);
+        historyList.add(dataJSON);
+        debugPrint("Datanya udah ada, dihapus dulu");
+      } else {
+        historyList.add(dataJSON);
+        debugPrint("Datanya gaada, list baru ditambahkan");
+      }
+
+      if (historyList.length > 5) {
+        historyList.removeAt(0);
+      }
+
+      prefs.setStringList('riwayat', historyList);
+    } catch (err) {
+      // handling error
+    }
   }
 
   Future<void> _getData(String id) async {
@@ -46,13 +89,30 @@ class _DetailPageState extends State<DetailPage> {
         "https://be.sibesti.com/api/kualitas/$id"; // Ganti dengan URL API yang sesuai
     try {
       final response = await http.get(Uri.parse(url));
-      debugPrint(response.statusCode.toString());
       if (response.statusCode.toString().startsWith("2")) {
-        debugPrint(response.body);
+        Map<String, dynamic> data = jsonDecode(response.body);
         setState(() {
           _isLoading = false;
-          _response = jsonDecode(response.body);
+          _response = data;
         });
+        await _saveToLocalStorage(data["data"]);
+        await _getFileFromUrl(
+                "https://www.be.sibesti.com/${data["data"]["dokumenPemegang"]}",
+                name: data["data"]["dokumenPemegang"])
+            .then(
+          (values) => {
+            setState(() {
+              // ignore: unnecessary_null_comparison
+              if (values != null) {
+                pathPDF = values.path;
+                _isLoading = false;
+                _isError = false;
+              } else {
+                _isError = true;
+              }
+            })
+          },
+        );
       } else {
         Map<String, dynamic> err = jsonDecode(response.body);
         String message = err['message'];
@@ -61,7 +121,6 @@ class _DetailPageState extends State<DetailPage> {
           _isLoading = false;
           _errorMsg = message;
         });
-        debugPrint(message);
       }
     } catch (e) {
       setState(() {
@@ -72,19 +131,21 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Future<File> fromAsset(String asset, String filename) async {
-    Completer<File> completer = Completer();
-    try {
-      var dir = await getApplicationDocumentsDirectory();
-      File file = File("${dir.path}/$filename");
-      var data = await rootBundle.load(asset);
-      var bytes = data.buffer.asUint8List();
-      await file.writeAsBytes(bytes, flush: true);
-      completer.complete(file);
-    } catch (e) {
-      error = 'Error: ${e.toString()}';
+  Future<File> _getFileFromUrl(String url, {name}) async {
+    var fileName = 'noname';
+    if (name != null) {
+      fileName = name;
     }
-    return completer.future;
+    try {
+      var data = await http.get(Uri.parse(url));
+      var bytes = data.bodyBytes;
+      var dir = await getApplicationDocumentsDirectory();
+      File file = File("${dir.path}/$fileName.pdf");
+      File urlFile = await file.writeAsBytes(bytes);
+      return urlFile;
+    } catch (e) {
+      throw Exception("Error opening url file");
+    }
   }
 
   @override
@@ -110,9 +171,10 @@ class _DetailPageState extends State<DetailPage> {
           backgroundColor: Colors.white,
         ),
         floatingActionButton: const CameraButton(),
+        backgroundColor: Colors.white,
         body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: Color(0xff37718E)),
+                child: CircularProgressIndicator(color: Color(0xFF378E55)),
               )
             : _isError
                 ? Center(
@@ -140,7 +202,7 @@ class _DetailPageState extends State<DetailPage> {
                       Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color: const Color(0xff255771),
+                            color: const Color(0xFF257141),
                           ),
                           margin: const EdgeInsets.symmetric(vertical: 5),
                           child: Column(
@@ -151,14 +213,15 @@ class _DetailPageState extends State<DetailPage> {
                                         horizontal: 15, vertical: 10),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: const Color(0xff37718E),
+                                      color: const Color(0xFF378E55),
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          _response!['data']['namaPemegang'],
+                                          _response?['data']['namaPemegang'] ??
+                                              "Null",
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,
@@ -166,10 +229,10 @@ class _DetailPageState extends State<DetailPage> {
                                           ),
                                         ),
                                         Text(
-                                          "ID - ${_response!['data']['_uuid']}"
+                                          "ID - ${_response?['data']['_uuid'] ?? "Null"}"
                                               .toUpperCase(),
                                           style: const TextStyle(
-                                            color: Color(0xff255771),
+                                            color: Color(0xFF257141),
                                             fontSize: 12,
                                           ),
                                         ),
@@ -193,12 +256,12 @@ class _DetailPageState extends State<DetailPage> {
                                                 BorderRadius.circular(7),
                                           ),
                                           child: Text(
-                                            _response!['data']['upb'],
+                                            _response?['data']['upb'] ?? "Null",
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w500,
-                                              color: Color(0xff37718E),
+                                              color: Color(0xFF378E55),
                                             ),
                                           ),
                                         ),
@@ -215,8 +278,9 @@ class _DetailPageState extends State<DetailPage> {
                                               ),
                                             ),
                                             Text(
-                                              _response!['data']
-                                                  ['namaPemegang'],
+                                              _response?['data']
+                                                      ['namaPemegang'] ??
+                                                  "Null",
                                               style: const TextStyle(
                                                   color: Color(0xffF5F5F5),
                                                   fontSize: 18,
@@ -253,7 +317,7 @@ class _DetailPageState extends State<DetailPage> {
                                                               0xFF72ADCB);
                                                         }
                                                         return const Color(
-                                                            0xff37718E);
+                                                            0xFF378E55);
                                                       },
                                                     ),
                                                   ),
@@ -303,7 +367,7 @@ class _DetailPageState extends State<DetailPage> {
                                                               0xFF72ADCB);
                                                         }
                                                         return const Color(
-                                                            0xff37718E);
+                                                            0xFF378E55);
                                                       },
                                                     ),
                                                   ),
@@ -317,7 +381,28 @@ class _DetailPageState extends State<DetailPage> {
                                                                   .transparent,
                                                           builder: (BuildContext
                                                                   context) =>
-                                                              const ProductModal()),
+                                                              ProductModal(
+                                                                barangKe: (_response?['data']
+                                                                            [
+                                                                            'barangKe'] ??
+                                                                        0)
+                                                                    .toString(),
+                                                                imagaName: _response?[
+                                                                            'data']
+                                                                        [
+                                                                        'gambar'] ??
+                                                                    0,
+                                                                kondisi: _response?[
+                                                                            'data']
+                                                                        [
+                                                                        'kondisi'] ??
+                                                                    0,
+                                                                status: _response?[
+                                                                            'data']
+                                                                        [
+                                                                        'status'] ??
+                                                                    0,
+                                                              )),
                                                   icon: const Icon(
                                                       Icons.image_rounded),
                                                   label: const Text(
@@ -330,11 +415,14 @@ class _DetailPageState extends State<DetailPage> {
                                           dataKolom: [
                                             [
                                               "Nomor",
-                                              _response!['data']['nomorSPK']
+                                              _response?['data']['nomorSPK'] ??
+                                                  "Null"
                                             ],
                                             [
                                               "Tanggal",
-                                              _response!['data']['tanggalSPK']
+                                              _tanggal(_response?['data']
+                                                      ['tanggalSPK'] ??
+                                                  "1000-01-01T07:00:00.000Z")
                                             ],
                                           ],
                                         ),
@@ -346,20 +434,26 @@ class _DetailPageState extends State<DetailPage> {
                                           dataKolom: [
                                             [
                                               "Nomor SPM",
-                                              _response!['data']['nomorSPM']
+                                              _response?['data']['nomorSPM'] ??
+                                                  "Null"
                                             ],
                                             [
                                               "Tanggal SPM",
-                                              _response!['data']['tanggalSPM']
-                                            ],
-                                            [
-                                              "Tanggal SP2D",
-                                              _response!['data']['tanggalSP2D']
+                                              _tanggal(_response?['data']
+                                                      ['tanggalSPM'] ??
+                                                  "1000-01-01T07:00:00.000Z")
                                             ],
                                             [
                                               "Nomor SP2D",
-                                              _response!['data']['nomorSP2D']
-                                            ]
+                                              _response?['data']['nomorSP2D'] ??
+                                                  "Null"
+                                            ],
+                                            [
+                                              "Tanggal SP2D",
+                                              _tanggal(_response?['data']
+                                                      ['tanggalSP2D'] ??
+                                                  "1000-01-01T07:00:00.000Z")
+                                            ],
                                           ],
                                         ),
                                         const SizedBox(
@@ -369,18 +463,26 @@ class _DetailPageState extends State<DetailPage> {
                                           judul: "Jumlah Total",
                                           dataKolom: [
                                             [
-                                              "Jumlah",
-                                              _response!['data']['hargaSatuan']
+                                              "Jumlah Barang",
+                                              (_response?['data']
+                                                          ['jumlahBarang'] ??
+                                                      0)
                                                   .toString()
                                             ],
                                             [
                                               "Harga Satuan",
-                                              _response!['data']['jumlahBarang']
+                                              rupiah
+                                                  .format(_response?['data']
+                                                          ['hargaSatuan'] ??
+                                                      0)
                                                   .toString()
                                             ],
                                             [
                                               "Jumlah Harga",
-                                              _response!['data']['jumlahHarga']
+                                              rupiah
+                                                  .format(_response?['data']
+                                                          ['jumlahHarga'] ??
+                                                      0)
                                                   .toString()
                                             ]
                                           ],
@@ -396,7 +498,10 @@ class _DetailPageState extends State<DetailPage> {
                                               color: Color(0xffF5F5F5),
                                             )),
                                         Text(
-                                            _response!['data']['totalBelanja']
+                                            rupiah
+                                                .format(_response?['data']
+                                                        ['totalBelanja'] ??
+                                                    0)
                                                 .toString(),
                                             textAlign: TextAlign.end,
                                             style: const TextStyle(

@@ -87,7 +87,7 @@ class _PdfViewModalState extends State<PdfViewModal> {
                 child: const Text(
                   "Dokumen Pemegang",
                   style: TextStyle(
-                    color: Color(0xff37718E),
+                    color: Color(0xFF378E55),
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
@@ -128,13 +128,11 @@ class _PdfViewModalState extends State<PdfViewModal> {
                     setState(() {
                       errorMessage = error.toString();
                     });
-                    debugPrint(error.toString());
                   },
                   onPageError: (page, error) {
                     setState(() {
                       errorMessage = '$page: ${error.toString()}';
                     });
-                    debugPrint('$page: ${error.toString()}');
                   },
                   onViewCreated: (PDFViewController pdfViewController) {
                     if (!_controllerPDF.isCompleted) {
@@ -151,7 +149,8 @@ class _PdfViewModalState extends State<PdfViewModal> {
               child: errorMessage.isEmpty
                   ? !isReady
                       ? const Center(
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(
+                              color: Color(0xFF378E55)),
                         )
                       : Container()
                   : Center(

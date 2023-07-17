@@ -53,8 +53,8 @@ class MiniCard extends StatelessWidget {
                   height: getSizeWidth(context) / 3,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    // 0xff255771
-                    color: Color(0xff255771),
+                    // 0xFF257141
+                    color: Color(0xFF257141),
                   ),
                 ),
               ),
@@ -72,7 +72,7 @@ class MiniCard extends StatelessWidget {
                 child: Text(
                   judul,
                   style: const TextStyle(
-                    color: Color(0xff37718E),
+                    color: Color(0xFF378E55),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
